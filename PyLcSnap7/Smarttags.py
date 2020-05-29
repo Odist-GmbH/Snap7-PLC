@@ -57,10 +57,10 @@ class BoolArray:
         self.length = length
 
     def read(self):
-        return self.client.readRealArray(self.db, self.start, self.length)
+        return self.client.readBoolArray(self.db, self.start, self.length)
 
     def write(self, values):
-        self.client.writeRealArray(self.db, self.start, values)
+        self.client.writeBoolArray(self.db, self.start, values)
 
     def __repr__(self):
         return f"PLC: {self.client} DB: {self.db} Start: {self.start} Length: {self.length}"

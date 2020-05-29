@@ -1,9 +1,10 @@
 import snap7
-from Smarttags import RealArray, Real
+import math
+from PyLcSnap7.Smarttags import RealArray, Real
 
 
 class S7Conn:
-    def __init__(self, ip='192.168.0.4', plcname=None):
+    def __init__(self, ip='192.168.0.4', plcname='Default'):
         self.ip = ip
         self.plcname = plcname
         self.port = 102
@@ -63,6 +64,17 @@ class S7Conn:
         else:
             return self.readBool(db, start, offset)
 
+    def readBoolArray(self, db, start, lenght):
+        if self.connect():
+            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, math.ceil(lenght/8)+1)
+            data = []
+            for b in range(math.ceil(lenght/8)+1):
+                for x in range(0,8):
+                    data.append(snap7.util.get_bool(reading, b, x))
+            return data[:lenght+1]
+        else:
+            return self.readRealArray(db, start, lenght)
+
     def writeBool(self, db, start, offset, value):
         if self.connect():
             reading = self.client.db_read(db, start, 1)
@@ -106,11 +118,3 @@ class S7Conn:
 
     def __repr__(self):
         return f"{self.plcname if self.plcname else 'NoName'}@{self.ip}"
-
-
-if __name__ == '__main__':
-    x = S7Conn(plcname='1500F')
-    arr = RealArray(x,811,0,3000)
-    real = Real(x,811,0)
-
-    print(1)
