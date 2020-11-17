@@ -1,96 +1,79 @@
-class Real:
-    def __init__(self, client, db, start):
-        self.client = client
-        self.db = db
-        self.start = start
-
-    def read(self):
-        return self.client.readReal(self.db, self.start)
-
-    def write(self, value):
-        self.client.writeReal(self.db, self.start, value)
-
-    def __repr__(self):
-        return f"{self.read()}"
-
-    def __str__(self):
-        return f"{self.read()}"
-
-class RealArray:
-    def __init__(self, client, db, start, length):
-        self.client = client
-        self.db = db
-        self.start = start
-        self.length = length
-
-    def read(self):
-        return self.client.readRealArray(self.db, self.start, self.length)
-
-    def write(self, values):
-        self.client.writeRealArray(self.db, self.start, values)
-
-    def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start} Length: {self.length}"
-
-    def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start} Length: {self.length}"
+from PyLcSnap7.DataTypes import *
 
 
-class Bool:
-    def __init__(self, client, db, start, offset):
-        self.client = client
-        self.db = db
-        self.start = start
-        self.offset = offset
+class SmartTags:
+    def __init__(self, client):
+        """
+        Wrapper around all Plc Datatypes:
+            Bool
+            Bool Array
+            Byte
+            Byte Array
+            Word
+            Word Array
+            Dword
+            Dword Array
+            Lword
+            Lword Array
+            Sint
+            Sint Array
+            Int
+            Int Array
+            Dint
+            Dint Array
+            Usint
+            Usint Array
+            Uint
+            Uint Array
+            Udint
+            Udint Array
+            Lint
+            Lint Array
+            Ulint
+            Ulint Array
+            Real
+            Real Array
+            Lreal
+            Lreal Array
+            Time
+            Time Array
+            Ltime
+            Ltime Array
+            Char
+            Char Array
+            Wchar
+            Wchar Array
+            String
+            String Array
+            Wstring
+            Wstring Array
+            Date
+            Date Array
+            Tod
+            Tod Array
+            Ltod
+            Ltod Array
+            Dt
+            Dt Array
+            Ldt
+            Ldt Array
+            Dtl
+            Dtl Array
+        :param client:
+        """
+        self._client = client
 
-    def read(self):
-        return self.client.readBool(self.db, self.start, self.offset)
+    def Bool(self, db, start, offset):
+        return Bool(self._client, db, start, offset)
 
-    def write(self, value):
-        self.client.writeBool(self.db, self.start, self.offset, value)
-
-class BoolArray:
-    def __init__(self, client, db, start, length):
-        self.client = client
-        self.db = db
-        self.start = start
-        self.length = length
-
-    def read(self):
-        return self.client.readBoolArray(self.db, self.start, self.length)
-
-    def write(self, values):
-        self.client.writeBoolArray(self.db, self.start, values)
-
-    def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start} Length: {self.length}"
-
-    def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start} Length: {self.length}"
+    def BoolArray(self, db, start, length):
+        return BoolArray(self._client, db, start, length)
 
 
-class Int:
-    def __init__(self, client, db, start):
-        self.client = client
-        self.db = db
-        self.start = start
 
-    def read(self):
-        return self.client.readInt(self.db, self.start)
 
-    def write(self, value):
-        self.client.writeInt(self.db, self.start, value)
 
-class String:
-    def __init__(self, client, db, start, length=255):
-        self.client = client
-        self.db = db
-        self.start = start
-        self.length = length
 
-    def read(self):
-        return self.client.readString(self.db, self.start, self.length)
 
-    def write(self, value):
-        self.client.writeString(self.db, self.start, self.length, value)
+
 
