@@ -720,3 +720,96 @@ class LTOD:
 
     def __str__(self):
         return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+
+
+class DT:
+    """
+    todo DT
+    Breite (Bit): 64
+    Wertebereich: Min.: DT#1990-01-01-0:0:0 Max.: DT#2089-12-31-23:59:59.999
+    S71500: x
+    S71200:
+    """
+
+    def __init__(self, client, db, start):
+        self.client = client
+        self.db = db
+        self.start = start
+        self._bytelength = 8
+
+    def read(self):
+        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        ms = int().from_bytes(reading, 'big', signed=False)
+        return ms
+
+    def write(self, ns):
+        reading = int(ns).to_bytes(self._bytelength, 'big', signed=False)
+        self.client.db_write(self.db, self.start, reading)
+
+    def __repr__(self):
+        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+
+    def __str__(self):
+        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+
+
+class LDT:
+    """
+    todo LDT
+    Breite (Bit): 64
+    Wertebereich: Min.: DT#1990-01-01-0:0:0 Max.: DT#2089-12-31-23:59:59.999
+    S71500: x
+    S71200:
+    """
+
+    def __init__(self, client, db, start):
+        self.client = client
+        self.db = db
+        self.start = start
+        self._bytelength = 8
+
+    def read(self):
+        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        ms = int().from_bytes(reading, 'big', signed=False)
+        return ms
+
+    def write(self, ns):
+        reading = int(ns).to_bytes(self._bytelength, 'big', signed=False)
+        self.client.db_write(self.db, self.start, reading)
+
+    def __repr__(self):
+        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+
+    def __str__(self):
+        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+
+
+class DTL:
+    """
+    todo DTL
+    Breite (Bit): 64
+    Wertebereich: Min.: DT#1990-01-01-0:0:0 Max.: DT#2089-12-31-23:59:59.999
+    S71500: x
+    S71200:
+    """
+
+    def __init__(self, client, db, start):
+        self.client = client
+        self.db = db
+        self.start = start
+        self._bytelength = 8
+
+    def read(self):
+        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        ms = int().from_bytes(reading, 'big', signed=False)
+        return ms
+
+    def write(self, ns):
+        reading = int(ns).to_bytes(self._bytelength, 'big', signed=False)
+        self.client.db_write(self.db, self.start, reading)
+
+    def __repr__(self):
+        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+
+    def __str__(self):
+        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"

@@ -169,6 +169,12 @@ class S7:
     def writeLTOD(self, db, start, value):
         return LTOD(self.client, db, start).write(value)
 
+    def readDT(self, db, start):
+        return DT(self.client, db, start).read()
+
+    def writeDT(self, db, start, value):
+        return DT(self.client, db, start).write(value)
+
     ######
 
     ######
@@ -215,6 +221,6 @@ if __name__ == '__main__':
     x.connect()
 
     y = x.readDate(100,3440)
-    y = x.readLTOD(100,3470)
+    y = x.readDT(100,3510)
 
     print(2)
