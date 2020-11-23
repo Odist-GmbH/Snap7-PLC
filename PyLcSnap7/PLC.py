@@ -5,6 +5,8 @@ import numpy
 import datetime
 from PyLcSnap7.Smarttags import SmartTags
 
+from PyLcSnap7.DataTypes import *
+
 
 class S7Conn:
     def __init__(self, ip='192.168.0.4', plcname='Default'):
@@ -27,11 +29,110 @@ class S7Conn:
                 return False
 
     def readBool(self, db, start, offset):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 1)
-            return snap7.util.get_bool(reading, 0, offset)
-        else:
-            return self.readBool(db, start, offset)
+        return Bool(self.client, db, start, offset).read()
+
+    def writeBool(self, db, start, offset, value):
+        return Bool(self.client, db, start, offset).write(value)
+
+    def readByte(self, db, start):
+        return Byte(self.client, db, start).read()
+
+    def writeByte(self, db, start, value):
+        return Byte(self.client, db, start).write(value)
+
+    def readWord(self, db, start):
+        return Word(self.client, db, start).read()
+
+    def writeWord(self, db, start, value):
+        return Word(self.client, db, start).write(value)
+
+    def readDWord(self, db, start):
+        return DWord(self.client, db, start).read()
+
+    def writeDWord(self, db, start, value):
+        return DWord(self.client, db, start).write(value)
+
+    def readLWord(self, db, start):
+        return LWord(self.client, db, start).read()
+
+    def writeLWord(self, db, start, value):
+        return LWord(self.client, db, start).write(value)
+
+    def readSInt(self, db, start):
+        return SInt(self.client, db, start).read()
+
+    def writeSInt(self, db, start, value):
+        return SInt(self.client, db, start).write(value)
+
+    def readInt(self, db, start):
+        return Int(self.client, db, start).read()
+
+    def writeInt(self, db, start, value):
+        return Int(self.client, db, start).write(value)
+
+    def readDInt(self, db, start):
+        return DInt(self.client, db, start).read()
+
+    def writeDInt(self, db, start, value):
+        return DInt(self.client, db, start).write(value)
+
+    def readUSInt(self, db, start):
+        return USInt(self.client, db, start).read()
+
+    def writeUSInt(self, db, start, value):
+        return USInt(self.client, db, start).write(value)
+
+    def readUInt(self, db, start):
+        return UInt(self.client, db, start).read()
+
+    def writeUInt(self, db, start, value):
+        return UInt(self.client, db, start).write(value)
+
+    def readUDInt(self, db, start):
+        return UDInt(self.client, db, start).read()
+
+    def writeUDInt(self, db, start, value):
+        return UDInt(self.client, db, start).write(value)
+
+    def readLInt(self, db, start):
+        return LInt(self.client, db, start).read()
+
+    def writeLInt(self, db, start, value):
+        return LInt(self.client, db, start).write(value)
+
+    def readULInt(self, db, start):
+        return ULInt(self.client, db, start).read()
+
+    def writeULInt(self, db, start, value):
+        return ULInt(self.client, db, start).write(value)
+
+    def readReal(self, db, start):
+        return Real(self.client, db, start).read()
+
+    def writeReal(self, db, start, value):
+        return Real(self.client, db, start).write(value)
+
+    def readLReal(self, db, start):
+        return LReal(self.client, db, start).read()
+
+    def writeLReal(self, db, start, value):
+        return LReal(self.client, db, start).write(value)
+
+    def readTime(self, db, start):
+        return Time(self.client, db, start).read()
+
+    def writeTime(self, db, start, value):
+        return Time(self.client, db, start).write(value)
+
+    def readLTime(self, db, start):
+        return LTime(self.client, db, start).read()
+
+    def writeLTime(self, db, start, value):
+        return LTime(self.client, db, start).write(value)
+
+    ######
+
+    ######
 
     def readBoolArray(self, db, start, lenght):
         if self.connect():
@@ -44,189 +145,7 @@ class S7Conn:
         else:
             return self.readRealArray(db, start, lenght)
 
-    def writeBool(self, db, start, offset, value):
-        if self.connect():
-            reading = self.client.db_read(db, start, 1)
-            snap7.util.set_bool(reading, 0, offset, value)
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeBool(db, start, offset, value)
 
-    def readByte(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 1)
-            return int().from_bytes(reading, 'big')
-        else:
-            return self.readByte(db, start)
-
-    def writeByte(self, db, start, value):
-        if self.connect():
-            reading = int(value).to_bytes(1, byteorder='big')
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeByte(db, start, value)
-
-    def readWord(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 2)
-            return int().from_bytes(reading, 'big')
-        else:
-            return self.readWord(db, start)
-
-    def writeWord(self, db, start, value):
-        if self.connect():
-            reading = int(value).to_bytes(2, byteorder='big')
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeWord(db, start, value)
-
-    def readDWord(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 4)
-            return int().from_bytes(reading, 'big')
-        else:
-            return self.readDWord(db, start)
-
-    def writeDWord(self, db, start, value):
-        if self.connect():
-            reading = int(value).to_bytes(4, byteorder='big')
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeDWord(db, start, value)
-
-    def readLWord(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 8)
-            return int().from_bytes(reading, 'big')
-        else:
-            return self.readLWord(db, start)
-
-    def writeLWord(self, db, start, value):
-        if self.connect():
-            reading = int(value).to_bytes(8, byteorder='big')
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeLWord(db, start, value)
-
-    def readSInt(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 1)
-            return int().from_bytes(reading, 'big', signed=True)
-        else:
-            return self.readSInt(db, start)
-
-    def writeSInt(self, db, start, value):
-        if self.connect():
-            reading = int(value).to_bytes(1, byteorder='big', signed=True)
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeSInt(db, start, value)
-
-    def readInt(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 2)
-            return snap7.util.get_int(reading, 0)
-        else:
-            return self.readInt(db, start)
-
-    def writeInt(self, db, start, value):
-        if self.connect():
-            reading = self.client.db_read(db, start, 2)
-            snap7.util.set_int(reading, 0, value)
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeInt(db, start, value)
-
-    def readDInt(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 4)
-            return int().from_bytes(reading, 'big', signed=True)
-        else:
-            return self.readDInt(db, start)
-
-    def writeDInt(self, db, start, value):
-        if self.connect():
-            reading = int(value).to_bytes(4, byteorder='big', signed=True)
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeDInt(db, start, value)
-
-    def readUSInt(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 1)
-            return int().from_bytes(reading, 'big')
-        else:
-            return self.readUSInt(db, start)
-
-    def writeUSInt(self, db, start, value):
-        if self.connect():
-            reading = int(value).to_bytes(1, byteorder='big')
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeUSInt(db, start, value)
-
-    def readUInt(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 2)
-            return int().from_bytes(reading, 'big')
-        else:
-            return self.readUInt(db, start)
-
-    def writeUInt(self, db, start, value):
-        if self.connect():
-            reading = int(value).to_bytes(2, byteorder='big')
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeUInt(db, start, value)
-
-    def readUDInt(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 4)
-            return int().from_bytes(reading, 'big')
-        else:
-            return self.readUDInt(db, start)
-
-    def writeUDInt(self, db, start, value):
-        if self.connect():
-            reading = int(value).to_bytes(4, byteorder='big')
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeUDInt(db, start, value)
-
-    def readLInt(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 8)
-            return int().from_bytes(reading, 'big', signed=True)
-        else:
-            return self.readLInt(db, start)
-
-    def writeLInt(self, db, start, value):
-        if self.connect():
-            reading = int(value).to_bytes(8, byteorder='big', signed=True)
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeLInt(db, start, value)
-
-    def readULInt(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 8)
-            return int().from_bytes(reading, 'big')
-        else:
-            return self.readULInt(db, start)
-
-    def writeULInt(self, db, start, value):
-        if self.connect():
-            reading = int(value).to_bytes(8, byteorder='big')
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeULInt(db, start, value)
-
-    def readReal(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 4)
-            return snap7.util.get_real(reading, 0)
-        else:
-            return self.readReal(db, start)
 
     def readRealArray(self, db, start, lenght):
         if self.connect():
@@ -237,13 +156,6 @@ class S7Conn:
         else:
             return self.readRealArray(db, start, lenght)
 
-    def writeReal(self, db, start, value):
-        if self.connect():
-            reading = self.client.db_read(db, start, 4)
-            snap7.util.set_real(reading, 0, value)
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeReal(db, start, value)
 
     def writeRealArray(self, db, start, data):
         if self.connect():
@@ -255,56 +167,11 @@ class S7Conn:
         else:
             return self.writeRealArray(db, start, data)
 
-    def readLReal(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 8)
-            return struct.unpack(">d", reading)
-        else:
-            return self.readLReal(db, start)
 
-    def writeLReal(self, db, start, value):
-        if self.connect():
-            reading = struct.pack(">d", value)
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeLReal(db, start, value)
 
-    def readTime(self, db, start, td=True):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 4)
-            if td:
-                return numpy.timedelta64(int().from_bytes(reading, 'big'), 'ms')
-            else:
-                return int().from_bytes(reading, 'big')
-        else:
-            return self.readTime(db, start, td=td)
 
-    def writeTime(self, db, start, value):
-        if self.connect():
-            reading = int(value).to_bytes(4, 'big')
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeTime(db, start, value)
 
-    def readLTime(self, db, start, dt=False):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 8)
-            value = struct.unpack('>q', struct.pack('8B', *reading))[0]
-            if dt:
-                td = numpy.timedelta64(value, 'ns')
-                return datetime.timedelta(microseconds=td.tolist() / 1e3)
-            else:
-                return value
 
-        else:
-            return self.readLTime(db, start)
-
-    def writeLTime(self, db, start, value):
-        if self.connect():
-            reading = int(value).to_bytes(8, 'big')
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeLTime(db, start, value)
 
     def readChar(self, db, start):
         if self.connect():
@@ -400,9 +267,10 @@ class S7Conn:
 
 if __name__ == '__main__':
     x = S7Conn('192.168.0.4', 'SandBoxCpu')
-    y = x.SmartTags.Bool(100, 0, 0)
-    y.read()
-    c = x.readWord(100, 10)
-    c = x.readLReal(100, 252)
+    x.connect()
+    y = x.readBool(100, 0, 0)
+    y = x.readLReal(100,252)
+    x.writeLTime(100,312,1001)
+    y = x.readLTime(100,312)
 
     print(2)
