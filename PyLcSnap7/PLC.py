@@ -258,7 +258,7 @@ class S7Conn:
     def readLReal(self, db, start):
         if self.connect():
             reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 8)
-            return struct.unpack(">d",reading)
+            return struct.unpack(">d", reading)
         else:
             return self.readLReal(db, start)
 
@@ -269,21 +269,28 @@ class S7Conn:
         else:
             return self.writeLReal(db, start, value)
 
-    def readTime(self, db, start):
+    def readTime(self, db, start, td=True):
         if self.connect():
             reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 4)
-            return numpy.timedelta64(int().from_bytes(reading,'big'), 'ms')
+            if td:
+                return numpy.timedelta64(int().from_bytes(reading, 'big'), 'ms')
+            else:
+                return int().from_bytes(reading, 'big')
         else:
-            return self.readTime(db, start)
+            return self.readTime(db, start, td=td)
 
     def writeTime(self, db, start, value):
-        pass
+        if self.connect():
+            reading = int(value).to_bytes(4, 'big')
+            self.client.db_write(db, start, reading)
+        else:
+            return self.writeTime(db, start, value)
 
-    def readLTime(self, db, start, getdt=False):
+    def readLTime(self, db, start, dt=False):
         if self.connect():
             reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 8)
             value = struct.unpack('>q', struct.pack('8B', *reading))[0]
-            if getdt:
+            if dt:
                 td = numpy.timedelta64(value, 'ns')
                 return datetime.timedelta(microseconds=td.tolist() / 1e3)
             else:
@@ -293,19 +300,39 @@ class S7Conn:
             return self.readLTime(db, start)
 
     def writeLTime(self, db, start, value):
-        pass
+        if self.connect():
+            reading = int(value).to_bytes(8, 'big')
+            self.client.db_write(db, start, reading)
+        else:
+            return self.writeLTime(db, start, value)
 
     def readChar(self, db, start):
-        pass
+        if self.connect():
+            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 2)
+            return reading.decode('utf-8')
+        else:
+            return self.readChar(db, start)
 
     def writeChar(self, db, start, value):
-        pass
+        if self.connect():
+            reading = value[:2].encode()
+            self.client.write_area(snap7.snap7types.S7AreaDB, db, start, reading)
+        else:
+            return self.writeChar(db, start, value)
 
     def readWChar(self, db, start):
-        pass
+        if self.connect():
+            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 2)
+            return reading.decode('utf-16')
+        else:
+            return self.readWChar(db, start)
 
     def writeWChar(self, db, start, value):
-        pass
+        if self.connect():
+            reading = value[:2].encode()
+            self.client.write_area(snap7.snap7types.S7AreaDB, db, start, reading)
+        else:
+            return self.writeWChar(db, start, value)
 
     def readString(self, db, start, len=255):
         if self.connect():
@@ -376,8 +403,6 @@ if __name__ == '__main__':
     y = x.SmartTags.Bool(100, 0, 0)
     y.read()
     c = x.readWord(100, 10)
-    c = x.readLReal(100,252)
-
-
+    c = x.readLReal(100, 252)
 
     print(2)

@@ -135,7 +135,7 @@ class LTime:
         self.start = start
 
     def read(self, getdt=False):
-        return self.client.readLTime(self.db, self.start, getdt=getdt)
+        return self.client.readLTime(self.db, self.start, dt=getdt)
 
     def write(self, value):
         raise NotImplementedError
