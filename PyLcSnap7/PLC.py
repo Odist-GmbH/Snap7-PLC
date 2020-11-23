@@ -1,14 +1,11 @@
 import snap7
 import math
-import struct
-import numpy
-import datetime
 from PyLcSnap7.Smarttags import SmartTags
 
 from PyLcSnap7.DataTypes import *
 
 
-class S7Conn:
+class S7:
     def __init__(self, ip='192.168.0.4', plcname='Default'):
         self.ip = ip
         self.plcname = plcname
@@ -130,6 +127,48 @@ class S7Conn:
     def writeLTime(self, db, start, value):
         return LTime(self.client, db, start).write(value)
 
+    def readChar(self, db, start):
+        return Char(self.client, db, start).read()
+
+    def writeChar(self, db, start, value):
+        return Char(self.client, db, start).write(value)
+
+    def readWChar(self, db, start):
+        return WChar(self.client, db, start).read()
+
+    def writeWChar(self, db, start, value):
+        return WChar(self.client, db, start).write(value)
+
+    def readString(self, db, start, length=255):
+        return String(self.client, db, start, length).read()
+
+    def writeString(self, db, start, value, length=255):
+        return String(self.client, db, start, length).write(value)
+
+    def readWString(self, db, start, length=255):
+        return WString(self.client, db, start, length).read()
+
+    def writeWString(self, db, start, value, length=255):
+        return WString(self.client, db, start, length).write(value)
+
+    def readDate(self, db, start):
+        return Date(self.client, db, start).read()
+
+    def writeDate(self, db, start, value):
+        return Date(self.client, db, start).write(value)
+
+    def readTOD(self, db, start):
+        return TOD(self.client, db, start).read()
+
+    def writeTOD(self, db, start, value):
+        return TOD(self.client, db, start).write(value)
+
+    def readLTOD(self, db, start):
+        return LTOD(self.client, db, start).read()
+
+    def writeLTOD(self, db, start, value):
+        return LTOD(self.client, db, start).write(value)
+
     ######
 
     ######
@@ -145,8 +184,6 @@ class S7Conn:
         else:
             return self.readRealArray(db, start, lenght)
 
-
-
     def readRealArray(self, db, start, lenght):
         if self.connect():
             bytelength = 4
@@ -155,7 +192,6 @@ class S7Conn:
             return array
         else:
             return self.readRealArray(db, start, lenght)
-
 
     def writeRealArray(self, db, start, data):
         if self.connect():
@@ -167,97 +203,6 @@ class S7Conn:
         else:
             return self.writeRealArray(db, start, data)
 
-
-
-
-
-
-
-    def readChar(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 2)
-            return reading.decode('utf-8')
-        else:
-            return self.readChar(db, start)
-
-    def writeChar(self, db, start, value):
-        if self.connect():
-            reading = value[:2].encode()
-            self.client.write_area(snap7.snap7types.S7AreaDB, db, start, reading)
-        else:
-            return self.writeChar(db, start, value)
-
-    def readWChar(self, db, start):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 2)
-            return reading.decode('utf-16')
-        else:
-            return self.readWChar(db, start)
-
-    def writeWChar(self, db, start, value):
-        if self.connect():
-            reading = value[:2].encode()
-            self.client.write_area(snap7.snap7types.S7AreaDB, db, start, reading)
-        else:
-            return self.writeWChar(db, start, value)
-
-    def readString(self, db, start, len=255):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, len)
-            return snap7.util.get_string(reading, 0, len)
-        else:
-            return self.readString(db, start, len)
-
-    def writeString(self, db, start, value):
-        if self.connect():
-            reading = self.client.read_area(snap7.snap7types.S7AreaDB, db, start, 255)
-            snap7.util.set_string(reading, 0, value, 255)
-            self.client.db_write(db, start, reading)
-        else:
-            return self.writeString(db, start, value)
-
-    def readWString(self, db, start):
-        pass
-
-    def writeWString(self, db, start, value):
-        pass
-
-    def readDate(self, db, start):
-        pass
-
-    def writeDate(self, db, start, value):
-        pass
-
-    def readTod(self, db, start):
-        pass
-
-    def writeTod(self, db, start, value):
-        pass
-
-    def readLTod(self, db, start):
-        pass
-
-    def writeLTod(self, db, start, value):
-        pass
-
-    def readDT(self, db, start):
-        pass
-
-    def writeDT(self, db, start, value):
-        pass
-
-    def readLDT(self, db, start):
-        pass
-
-    def writeLDT(self, db, start, value):
-        pass
-
-    def readDTL(self, db, start):
-        pass
-
-    def writeDTL(self, db, start, value):
-        pass
-
     def disconnect(self):
         self.client.disconnect()
 
@@ -266,11 +211,10 @@ class S7Conn:
 
 
 if __name__ == '__main__':
-    x = S7Conn('192.168.0.4', 'SandBoxCpu')
+    x = S7('192.168.0.4', 'SandBoxCpu')
     x.connect()
-    y = x.readBool(100, 0, 0)
-    y = x.readLReal(100,252)
-    x.writeLTime(100,312,1001)
-    y = x.readLTime(100,312)
+
+    y = x.readDate(100,3440)
+    y = x.readLTOD(100,3470)
 
     print(2)
