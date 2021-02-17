@@ -36,6 +36,30 @@ class Bool:
         return f"PLC: {self.client} DB: {self.db} Start: {self.start} Offset: {self.offset}"
 
 
+class BoolArray:
+    def __init__(self, client: snap7.client.Client, db, start, offset, size):
+        self.client = client
+        self.db = db
+        self.start = start
+        self.offset = offset
+        self.size = size
+        self._boolarray = []
+
+    def read(self):
+        data_array = self.client.read_area(snap7.snap7types.S7AreaDB, 1, 0, 1044)
+        offset_count = self.offset
+        byte_index = self.start
+        for bool_count in range(self.size + 1):
+            reading = snap7.util.get_bool(data_array, byte_index, offset_count)
+            self._boolarray.append(reading)
+            if offset_count < 7:
+                offset_count += 1
+            else:
+                offset_count = 0
+                byte_index += 1
+        return self._boolarray
+
+
 class Byte:
     """
     Breite (Bit): 8
