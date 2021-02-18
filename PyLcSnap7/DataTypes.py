@@ -1,7 +1,7 @@
 import snap7
 import struct
 import datetime
-
+import math
 
 # todo Arrays
 
@@ -37,26 +37,30 @@ class Bool:
 
 
 class BoolArray:
-    def __init__(self, client: snap7.client.Client, db, start, offset, size):
+    """
+    Breite (Bit): bool_count (Anzahl bools)
+    Wertebereich: dictionary with index keys + value TRUE/FALSE - e.g.[[1, 0 , 1], [False]]
+    S71500: x ??
+    S71200: x ??
+    """
+
+    def __init__(self, client: snap7.client.Client, db, start, bool_count):
         self.client = client
         self.db = db
         self.start = start
-        self.offset = offset
-        self.size = size
-        self._boolarray = []
+        self.bool_count = bool_count
+        self._boolarray = {}
 
     def read(self):
-        data_array = self.client.read_area(snap7.snap7types.S7AreaDB, 1, 0, 1044)
-        offset_count = self.offset
-        byte_index = self.start
-        for bool_count in range(self.size + 1):
-            reading = snap7.util.get_bool(data_array, byte_index, offset_count)
-            self._boolarray.append(reading)
-            if offset_count < 7:
-                offset_count += 1
-            else:
-                offset_count = 0
-                byte_index += 1
+        data_array = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, math.ceil(self.bool_count / 8) + 1)
+        b_count = 0 #so that exactly bool_count boolean are read (break within byte by offset value)
+        for byte_index in range(math.ceil(self.bool_count / 8)):
+            for offset_count in range(0, 8):
+                reading = snap7.util.get_bool(data_array, byte_index, offset_count)
+                self._boolarray[self.db, byte_index, offset_count] = reading
+                b_count += 1
+                if b_count == self.bool_count:
+                    break
         return self._boolarray
 
 
@@ -76,6 +80,7 @@ class Byte:
 
     def read(self):
         reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        print(int().from_bytes(reading, 'big', signed=False))
         return int().from_bytes(reading, 'big', signed=False)
 
     def write(self, value):
@@ -570,14 +575,14 @@ class WChar:
         self.client = client
         self.db = db
         self.start = start
-        self._bytelength = 1
+        self._bytelength = 2
 
     def read(self):
         reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
-        return reading.decode('utf-16')
+        return reading.decode('utf-16be')
 
     def write(self, value):
-        reading = value[:2].encode('utf-16')
+        reading = value[:2].encode('utf-16be')
         self.client.db_write(self.db, self.start, reading)
 
     def __repr__(self):
@@ -616,6 +621,30 @@ class String:
 
     def __str__(self):
         return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+
+
+class StringArray:
+    """
+    Breite (Byte): string count * 255
+    Wertebereich: 0 bis 254 Zeichen (n)
+    S71500: x
+    S71200: x
+    """
+
+    def __init__(self, client: snap7.client.Client, db, start, string_count, length=255):
+        self.client = client
+        self.db = db
+        self.start = start
+        self.length = length
+        self.string_count = string_count
+        self._stringarray = {}
+
+    def read(self):
+        data_array = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self.string_count * self.length)
+        for byte_index in range(0, self.string_count * self.length, 256):
+            reading = snap7.util.get_string(data_array, byte_index, max_size=self.length)
+            self._stringarray[self.db, byte_index] = reading
+        return self._stringarray
 
 
 class WString:
