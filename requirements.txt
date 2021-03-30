@@ -1,1 +1,1 @@
-python-snap7==0.11
+python-snap7=1.0

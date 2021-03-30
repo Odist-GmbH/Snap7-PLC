@@ -12,28 +12,29 @@ class Bool:
     S71500: x
     S71200: x
     """
+    _bytelength = 1
 
-    def __init__(self, client: snap7.client.Client, db, start, offset):
-        self.client = client
+    def __init__(self, plc, db, start, offset):
+        self.plc = plc
         self.db = db
         self.start = start
         self.offset = offset
-        self._bytelength = 1
+        self._bytelength = Bool._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return snap7.util.get_bool(reading, 0, self.offset)
 
     def write(self, value):
-        reading = self.client.db_read(self.db, self.start, self._bytelength)
-        snap7.util.set_bool(reading, 0, self.offset, value)
-        self.client.db_write(self.db, self.start, reading)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
+        snap7.util.set_bool(reading, 0, self.offset, bool(value))
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start} Offset: {self.offset}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start} Offset: {self.offset}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start} Offset: {self.offset}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start} Offset: {self.offset}"
 
 
 class Byte:
@@ -43,26 +44,27 @@ class Byte:
     S71500: x
     S71200: x
     """
+    _bytelength = 1
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 1
+        self._bytelength = Byte._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return int().from_bytes(reading, 'big', signed=False)
 
     def write(self, value):
         reading = int(value).to_bytes(self._bytelength, 'big', signed=False)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class Word:
@@ -72,26 +74,27 @@ class Word:
     S71500: x
     S71200: x
     """
+    _bytelength = 2
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 2
+        self._bytelength = Word._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return int().from_bytes(reading, 'big', signed=False)
 
     def write(self, value):
         reading = int(value).to_bytes(self._bytelength, 'big', signed=False)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class DWord:
@@ -101,26 +104,27 @@ class DWord:
     S71500: x
     S71200: x
     """
+    _bytelength = 4
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 4
+        self._bytelength = DWord._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return int().from_bytes(reading, 'big', signed=False)
 
     def write(self, value):
         reading = int(value).to_bytes(self._bytelength, 'big', signed=False)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class LWord:
@@ -130,26 +134,27 @@ class LWord:
     S71500: x
     S71200:
     """
+    _bytelength = 8
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 8
+        self._bytelength = LWord._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return int().from_bytes(reading, 'big', signed=False)
 
     def write(self, value):
         reading = int(value).to_bytes(self._bytelength, 'big', signed=False)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class SInt:
@@ -159,26 +164,27 @@ class SInt:
     S71500: x
     S71200: x
     """
+    _bytelength = 1
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 1
+        self._bytelength = SInt._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return int().from_bytes(reading, 'big', signed=True)
 
     def write(self, value):
         reading = int(value).to_bytes(self._bytelength, 'big', signed=True)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class Int:
@@ -188,26 +194,27 @@ class Int:
     S71500: x
     S71200: x
     """
+    _bytelength = 2
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 2
+        self._bytelength = Int._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return int().from_bytes(reading, 'big', signed=True)
 
     def write(self, value):
         reading = int(value).to_bytes(self._bytelength, 'big', signed=True)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class DInt:
@@ -217,26 +224,27 @@ class DInt:
     S71500: x
     S71200: x
     """
+    _bytelength = 4
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 4
+        self._bytelength = DInt._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return int().from_bytes(reading, 'big', signed=True)
 
     def write(self, value):
         reading = int(value).to_bytes(self._bytelength, 'big', signed=True)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class USInt:
@@ -246,26 +254,27 @@ class USInt:
     S71500: x
     S71200: x
     """
+    _bytelength = 1
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 1
+        self._bytelength = USInt._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return int().from_bytes(reading, 'big', signed=False)
 
     def write(self, value):
         reading = int(value).to_bytes(self._bytelength, 'big', signed=False)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class UInt:
@@ -275,26 +284,27 @@ class UInt:
     S71500: x
     S71200: x
     """
+    _bytelength = 2
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 2
+        self._bytelength = UInt._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return int().from_bytes(reading, 'big', signed=False)
 
     def write(self, value):
         reading = int(value).to_bytes(self._bytelength, 'big', signed=False)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class UDInt:
@@ -304,26 +314,27 @@ class UDInt:
     S71500: x
     S71200: x
     """
+    _bytelength = 4
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 4
+        self._bytelength = UDInt._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return int().from_bytes(reading, 'big', signed=False)
 
     def write(self, value):
         reading = int(value).to_bytes(self._bytelength, 'big', signed=False)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class LInt:
@@ -333,26 +344,27 @@ class LInt:
     S71500: x
     S71200:
     """
+    _bytelength = 8
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 8
+        self._bytelength = LInt._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return int().from_bytes(reading, 'big', signed=True)
 
     def write(self, value):
         reading = int(value).to_bytes(self._bytelength, 'big', signed=True)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class ULInt:
@@ -362,26 +374,27 @@ class ULInt:
     S71500: x
     S71200:
     """
+    _bytelength = 8
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 8
+        self._bytelength = ULInt._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return int().from_bytes(reading, 'big', signed=True)
 
     def write(self, value):
         reading = int(value).to_bytes(self._bytelength, 'big', signed=True)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class Real:
@@ -393,27 +406,66 @@ class Real:
     S71500: x
     S71200: x
     """
+    _bytelength = 4
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 4
+        self._bytelength = Real._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return snap7.util.get_real(reading, 0)
 
     def write(self, value):
-        reading = self.client.db_read(self.db, self.start, self._bytelength)
+        reading = self.plc.db_read(self.db, self.start, self._bytelength)
         snap7.util.set_real(reading, 0, value)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
+
+
+class RealArray:
+    """
+    Breite (Bit): 32 * n
+    Wertebereich:   -3.402823e+38 bis -1.175 495e-38
+                                    ±0
+                    +1.175 495e-38 bis +3.402823e+38
+    S71500: x
+    S71200: x
+    """
+    _bytelength = 4
+
+    def __init__(self, plc, db, start, length):
+        self.plc = plc
+        self.db = db
+        self.start = start
+        self.length = length
+        self._bytelength = Real._bytelength
+
+    def read(self):
+        reading = self.plc.read(self.db, self.start, self._bytelength * (self.length + 1))
+        return [snap7.util.get_real(reading, i) for i in range(0, (self.length + 1) * 4, self._bytelength)]
+
+    def write(self, values):
+        if len(values) > self.length:
+            raise ValueError('Index out of range')
+
+        reading = self.plc.read(self.db, self.start, self._bytelength * (self.length + 1))
+        for e, r in enumerate(values + ([0] * (self.length - len(values)))):
+            snap7.util.set_real(reading, e * self._bytelength, r)
+        self.plc.write(self.db, self.start, reading)
+
+    def __repr__(self):
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
+
+    def __str__(self):
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class LReal:
@@ -425,26 +477,27 @@ class LReal:
     S71500: x
     S71200: x
     """
+    _bytelength = 8
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 8
+        self._bytelength = LReal._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return struct.unpack(">d", reading)[0]
 
     def write(self, value):
         reading = struct.pack(">d", value)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class Time:
@@ -454,26 +507,27 @@ class Time:
     S71500: x
     S71200: x
     """
+    _bytelength = 4
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 4
+        self._bytelength = Time._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return int().from_bytes(reading, 'big', signed=False)
 
     def write(self, value):
         reading = int(value).to_bytes(self._bytelength, 'big', signed=False)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class LTime:
@@ -483,26 +537,27 @@ class LTime:
     S71500: x
     S71200:
     """
+    _bytelength = 8
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 8
+        self._bytelength = LTime
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return struct.unpack('>q', struct.pack('8B', *reading))[0]
 
     def write(self, value):
         reading = int(value).to_bytes(self._bytelength, 'big', signed=False)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class Char:
@@ -512,26 +567,27 @@ class Char:
     S71500: x
     S71200: x
     """
+    _bytelength = 1
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 1
+        self._bytelength = Char._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return reading.decode('utf-8')
 
     def write(self, value):
         reading = value[:2].encode()
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class WChar:
@@ -541,26 +597,27 @@ class WChar:
     S71500: x
     S71200: x
     """
+    _bytelength = 1
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 1
+        self._bytelength = WChar._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return reading.decode('utf-16')
 
     def write(self, value):
         reading = value[:2].encode('utf-16')
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class String:
@@ -571,27 +628,27 @@ class String:
     S71200: x
     """
 
-    def __init__(self, client, db, start, length=255):
-        self.client = client
+    def __init__(self, plc, db, start, length=255):
+        self.plc = plc
         self.db = db
         self.start = start
         self.length = length
         self._bytelength = self.length + 2
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         return snap7.util.get_string(reading, 0, self.length)
 
     def write(self, value):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         snap7.util.set_string(reading, 0, value, self.length)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class WString:
@@ -602,31 +659,31 @@ class WString:
     S71200: x
     """
 
-    def __init__(self, client, db, start, length=255):
+    def __init__(self, plc, db, start, length=255):
         raise NotImplementedError
-        self.client = client
+        self.plc = plc
         self.db = db
         self.start = start
         self.length = length
         self._bytelength = (self.length + 2) * 2
 
     def read(self):
-        pre_reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, 4)
+        pre_reading = self.plc.read(self.db, self.start, 4)
         current_size = int().from_bytes(pre_reading[2:4], 'big', signed=False)
         max_size = int().from_bytes(pre_reading[:2], 'big', signed=False)
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start + 4, current_size * 2)
+        reading = self.plc.read(self.db, self.start + 4, current_size * 2)
 
         return struct.unpack(f">{current_size * 2}s", reading)[0].decode('utf-16')
 
     def write(self, value):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
-        self.client.db_write(self.db, self.start, reading)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class Date:
@@ -636,27 +693,28 @@ class Date:
     S71500: x
     S71200: x
     """
+    _bytelength = 2
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 2
+        self._bytelength = Date._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         day_offset = int().from_bytes(reading, 'big', signed=False)
         return datetime.date(1990, 1, 1) + datetime.timedelta(days=day_offset)
 
     def write(self, date):
         reading = int((date - datetime.date(1990, 1, 1)).days).to_bytes(self._bytelength, 'big', signed=False)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class TOD:
@@ -666,15 +724,16 @@ class TOD:
     S71500: x
     S71200: x
     """
+    _bytelength = 4
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 4
+        self._bytelength = TOD._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         ms = int().from_bytes(reading, 'big', signed=False)
         return (datetime.datetime.min + datetime.timedelta(milliseconds=ms)).time()
 
@@ -682,13 +741,13 @@ class TOD:
         ms = (time.hour * 60 * 60 * 1000) + (time.minute * 60 * 1000) + (time.second * 1000) + (
                 time.microsecond // 1000)
         reading = int(ms).to_bytes(self._bytelength, 'big', signed=False)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class LTOD:
@@ -699,27 +758,28 @@ class LTOD:
     S71200:
     todo time obj from ns base
     """
+    _bytelength = 8
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 8
+        self._bytelength = LTOD._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         ns = int().from_bytes(reading, 'big', signed=False)
         return ns
 
     def write(self, ns):
         reading = int(ns).to_bytes(self._bytelength, 'big', signed=False)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class DT:
@@ -730,27 +790,28 @@ class DT:
     S71500: x
     S71200:
     """
+    _bytelength = 8
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 8
+        self._bytelength = DT._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         ms = int().from_bytes(reading, 'big', signed=False)
         return ms
 
     def write(self, ns):
         reading = int(ns).to_bytes(self._bytelength, 'big', signed=False)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class LDT:
@@ -761,27 +822,28 @@ class LDT:
     S71500: x
     S71200:
     """
+    _bytelength = 8
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 8
+        self._bytelength = LDT._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         ms = int().from_bytes(reading, 'big', signed=False)
         return ms
 
     def write(self, ns):
         reading = int(ns).to_bytes(self._bytelength, 'big', signed=False)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
 class DTL:
@@ -792,24 +854,25 @@ class DTL:
     S71500: x
     S71200:
     """
+    _bytelength = 8
 
-    def __init__(self, client, db, start):
-        self.client = client
+    def __init__(self, plc, db, start):
+        self.plc = plc
         self.db = db
         self.start = start
-        self._bytelength = 8
+        self._bytelength = DTL._bytelength
 
     def read(self):
-        reading = self.client.read_area(snap7.snap7types.S7AreaDB, self.db, self.start, self._bytelength)
+        reading = self.plc.read(self.db, self.start, self._bytelength)
         ms = int().from_bytes(reading, 'big', signed=False)
         return ms
 
     def write(self, ns):
         reading = int(ns).to_bytes(self._bytelength, 'big', signed=False)
-        self.client.db_write(self.db, self.start, reading)
+        self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
     def __str__(self):
-        return f"PLC: {self.client} DB: {self.db} Start: {self.start}"
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
