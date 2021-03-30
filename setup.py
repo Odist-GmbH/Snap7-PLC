@@ -5,9 +5,9 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="PyLcSnap7-epics", # Replace with your own username
-    version="0.0.1",
-    author="Epics",
-    author_email="d.kummer0702@gmail.com",
+    version="0.0.2",
+    author="DominikK072",
+    author_email="dominik.kummer@odist.at",
     description="My first example package",
     long_description=long_description,
     long_description_content_type="text/markdown",
