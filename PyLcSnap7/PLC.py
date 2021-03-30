@@ -6,11 +6,18 @@ from PyLcSnap7.Smarttags import SmartTags
 
 
 class PLC:
-    def __init__(self, ip='127.0.0.1'):
+    def __init__(self, ip='127.0.0.1', name='Default Plc'):
         self.ip = ip
+        self.name = name
         self.read_client = Client()
         self.write_client = Client()
         self.SmartTags = SmartTags(self)
+
+    def __repr__(self):
+        return f"{self.name} @ {self.ip}"
+
+    def __str__(self):
+        return f"{self.name} @ {self.ip}"
 
     def connect(self):
         if self.read_client.get_connected() and self.write_client.get_connected():
