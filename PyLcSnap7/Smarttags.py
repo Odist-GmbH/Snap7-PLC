@@ -46,6 +46,9 @@ class SmartTags:
     def LInt(self, db, start):
         return LInt(self._plc, db, start)
 
+    def ULInt(self, db, start):
+        return ULInt(self._plc, db, start)
+
     def Real(self, db, start):
         return Real(self._plc, db, start)
 
