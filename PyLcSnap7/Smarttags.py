@@ -67,10 +67,10 @@ class SmartTags:
     def WChar(self, db, start):
         return WChar(self._plc, db, start)
 
-    def String(self, db, start, length=255):
+    def String(self, db, start, length=254):
         return String(self._plc, db, start, length=length)
 
-    def WString(self, db, start, length=255):
+    def WString(self, db, start, length=254):
         return WString(self._plc, db, start, length=length)
 
     def Date(self, db, start):
@@ -120,9 +120,8 @@ class SmartTagsArray:
         raise NotImplementedError
         return SInt(self._plc, db, start)
 
-    def Int(self, db, start):
-        raise NotImplementedError
-        return Int(self._plc, db, start)
+    def Int(self, db, start, length):
+        return [Int(self._plc, db, start + (Int._bytelength * i)) for i in range(length)]
 
     def DInt(self, db, start):
         raise NotImplementedError
@@ -155,9 +154,8 @@ class SmartTagsArray:
         raise NotImplementedError
         return Time(self._plc, db, start)
 
-    def LTime(self, db, start):
-        raise NotImplementedError
-        return LTime(self._plc, db, start)
+    def LTime(self, db, start, length):
+        return LTimeArray(self._plc, db, start, length)
 
     def Char(self, db, start):
         raise NotImplementedError
@@ -167,9 +165,8 @@ class SmartTagsArray:
         raise NotImplementedError
         return WChar(self._plc, db, start)
 
-    def String(self, db, start, length=255):
-        raise NotImplementedError
-        return String(self._plc, db, start, length=length)
+    def String(self, db, start, length, arrlen):
+        return [String(self._plc, db, start + (length + 2) * i, length=length) for i in range(arrlen)]
 
     def WString(self, db, start, length=255):
         raise NotImplementedError
@@ -195,6 +192,5 @@ class SmartTagsArray:
         raise NotImplementedError
         return LDT(self._plc, db, start)
 
-    def DTL(self, db, start):
-        raise NotImplementedError
-        return DTL(self._plc, db, start)
+    def DTL(self, db, start, length):
+        return DTLArray(self._plc, db, start, length)

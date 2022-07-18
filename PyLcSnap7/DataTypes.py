@@ -1,7 +1,9 @@
-import snap7
-import Util
-import struct
 import datetime
+import struct
+
+import snap7
+
+import PyLcSnap7.Util as Util
 
 
 # todo Arrays
@@ -9,7 +11,7 @@ import datetime
 
 class PlcVar:
     def __init__(self):
-        print(1)
+        pass
 
 
 class Bool(PlcVar):
@@ -37,7 +39,9 @@ class Bool(PlcVar):
 
     def read(self):
         reading = self.plc.read(self.db, self.start, self._bytelength)
-        return self.get(reading)
+        result = self.get(reading)
+        # print(f"Bool\t{str(result)}\t{self.db}\t{self.start}\t{self.offset}")
+        return result == True
 
     def write(self, value):
         if value is None:
@@ -596,7 +600,7 @@ class RealArray(PlcVar):
         self.db = db
         self.start = start
         self.length = length
-        self._bytelength = Real._bytelength
+        self._bytelength = RealArray._bytelength
         super(RealArray, self).__init__()
 
     def get(self):
@@ -609,14 +613,18 @@ class RealArray(PlcVar):
         reading = self.plc.read(self.db, self.start, self._bytelength * (self.length + 1))
         return [snap7.util.get_real(reading, i) for i in range(0, (self.length + 1) * 4, self._bytelength)]
 
-    def write(self, values):
+    def write(self, values, cb=None):
         if len(values) > self.length:
             raise ValueError('Index out of range')
 
-        reading = self.plc.read(self.db, self.start, self._bytelength * (self.length + 1))
+        reading = self.plc.read(self.db, self.start, self._bytelength * (self.length))
         for e, r in enumerate(values + ([0] * (self.length - len(values)))):
+            if cb is not None: cb(e, len(values + ([0] * (self.length - len(values)))))
             snap7.util.set_real(reading, e * self._bytelength, r)
+
         self.plc.write(self.db, self.start, reading)
+        if cb is not None: cb(len(values + ([0] * (self.length - len(values)))),
+                              len(values + ([0] * (self.length - len(values)))))
 
     def __repr__(self):
         return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
@@ -751,6 +759,47 @@ class LTime(PlcVar):
         return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
 
 
+class LTimeArray(PlcVar):
+    """
+    S71500: x
+    """
+    _bytelength = 8
+
+    def __init__(self, plc, db, start, length):
+        self.plc = plc
+        self.db = db
+        self.start = start
+        self.length = length
+        self._bytelength = LTimeArray._bytelength
+        super(LTimeArray, self).__init__()
+
+    def get(self):
+        pass
+
+    def set(self):
+        pass
+
+    def read(self):
+        reading = self.plc.read(self.db, self.start, self._bytelength * (self.length + 1))
+        return [Util.get_ltime(reading, i) for i in range(0, (self.length + 1) * 8, self._bytelength)]
+
+    def write(self, values):
+        if len(values) > self.length:
+            raise ValueError('Index out of range')
+
+        reading = self.plc.read(self.db, self.start, self._bytelength * (self.length))
+        for e, r in enumerate(values + ([0] * (self.length - len(values)))):
+            Util.set_ltime(reading, e * self._bytelength, r)
+
+        self.plc.write(self.db, self.start, reading)
+
+    def __repr__(self):
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
+
+    def __str__(self):
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
+
+
 class Char(PlcVar):
     """
     Breite (Bit): 8
@@ -851,7 +900,7 @@ class String(PlcVar):
         return snap7.util.get_string(bytearr, 0, self.length)
 
     def set(self, bytearr, value):
-        snap7.util.set_string(bytearr, 0, value, self._bytelength)
+        snap7.util.set_string(bytearr, 0, value,self.length)
         bytearr[0] = self.length
 
     def read(self):
@@ -862,7 +911,7 @@ class String(PlcVar):
         if value is None:
             value = ''
         reading = bytearray(self._bytelength)
-        self.set(reading, value)
+        self.set(reading, value[:self.length])
         self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
@@ -878,11 +927,12 @@ class WString(PlcVar):
     Wertebereich: 0 bis 16382 Zeichen (n)
     S71500: x
     S71200: x
+    todo .........
     """
 
     def __init__(self, plc, db, start, length=255):
         raise NotImplementedError
-        self.plc = plc
+        self._plc = plc
         self.db = db
         self.start = start
         self.length = length
@@ -930,19 +980,21 @@ class Date(PlcVar):
         self._bytelength = Date._bytelength
         super(Date, self).__init__()
 
-    def get(self):
-        pass
+    def get(self, bytearr):
+        return Util.get_date(bytearr, 0)
 
-    def set(self):
-        pass
+    def set(self, bytearr, value):
+        Util.set_date(bytearr, 0, value)
 
     def read(self):
         reading = self.plc.read(self.db, self.start, self._bytelength)
-        day_offset = int().from_bytes(reading, 'big', signed=False)
-        return datetime.date(1990, 1, 1) + datetime.timedelta(days=day_offset)
+        return self.get(reading)
 
     def write(self, date):
-        reading = int((date - datetime.date(1990, 1, 1)).days).to_bytes(self._bytelength, 'big', signed=False)
+        if date is None:
+            datetime.date(1990, 1, 1)
+        reading = bytearray(self._bytelength)
+        self.set(reading, date)
         self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
@@ -968,21 +1020,21 @@ class TOD(PlcVar):
         self._bytelength = TOD._bytelength
         super(TOD, self).__init__()
 
-    def get(self):
-        pass
+    def get(self, bytearr):
+        return Util.get_tod(bytearr, 0)
 
-    def set(self):
-        pass
+    def set(self, bytearr, value):
+        Util.set_tod(bytearr, 0, value)
 
     def read(self):
         reading = self.plc.read(self.db, self.start, self._bytelength)
-        ms = int().from_bytes(reading, 'big', signed=False)
-        return (datetime.datetime.min + datetime.timedelta(milliseconds=ms)).time()
+        return self.get(reading)
 
     def write(self, time):
-        ms = (time.hour * 60 * 60 * 1000) + (time.minute * 60 * 1000) + (time.second * 1000) + (
-                time.microsecond // 1000)
-        reading = int(ms).to_bytes(self._bytelength, 'big', signed=False)
+        if time is None:
+            time = datetime.time(0, 0, 0, 0)
+        reading = bytearray(self._bytelength)
+        self.set(reading, time)
         self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
@@ -1152,6 +1204,47 @@ class DTL(PlcVar):
         reading += int(minute).to_bytes(1, 'big', signed=False)
         reading += int(second).to_bytes(1, 'big', signed=False)
         reading += int(nanosecond).to_bytes(4, 'big', signed=False)
+        self.plc.write(self.db, self.start, reading)
+
+    def __repr__(self):
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
+
+    def __str__(self):
+        return f"PLC: {self.plc} DB: {self.db} Start: {self.start}"
+
+
+class DTLArray(PlcVar):
+    """
+    S71500: x
+    """
+    _bytelength = 12
+
+    def __init__(self, plc, db, start, length):
+        self.plc = plc
+        self.db = db
+        self.start = start
+        self.length = length
+        self._bytelength = DTLArray._bytelength
+        super(DTLArray, self).__init__()
+
+    def get(self):
+        pass
+
+    def set(self):
+        pass
+
+    def read(self):
+        reading = self.plc.read(self.db, self.start, self._bytelength * (self.length + 1))
+        return [Util.get_dtl(reading, i) for i in range(0, (self.length + 1) * self._bytelength, self._bytelength)]
+
+    def write(self, values):
+        if len(values) > self.length:
+            raise ValueError('Index out of range')
+
+        reading = self.plc.read(self.db, self.start, self._bytelength * (self.length))
+        for e, r in enumerate(values + ([0] * (self.length - len(values)))):
+            Util.set_dtl(reading, e * self._bytelength, r)
+
         self.plc.write(self.db, self.start, reading)
 
     def __repr__(self):
