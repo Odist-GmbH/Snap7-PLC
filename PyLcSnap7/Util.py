@@ -3,6 +3,10 @@ import math
 import struct
 
 
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")
+
+
 def get_lword(bytearray_: bytearray, byte_index: int) -> int:
     """ Gets the lword from the buffer.
     """

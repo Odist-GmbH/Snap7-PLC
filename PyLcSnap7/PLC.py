@@ -1,10 +1,14 @@
 import datetime
+import json
 import logging
 
+import zmq
 from snap7.client import Client
 from snap7.exceptions import Snap7Exception
 from snap7.types import Areas, cpu_statuses, PingTimeout, SendTimeout, RecvTimeout
 
+from PyLcSnap7 import DataTypes
+from PyLcSnap7 import Util
 from PyLcSnap7.Smarttags import SmartTags
 
 for name, logger in logging.root.manager.loggerDict.items():
@@ -12,7 +16,7 @@ for name, logger in logging.root.manager.loggerDict.items():
 
 
 class PLC:
-    def __init__(self, ip='127.0.0.1', name='Default Plc', lib_location='./bin/snap7.dll'):
+    def __init__(self, ip='127.0.0.1', name='Default Plc', lib_location='./PyLcSnap7/bin/fixsnap764.dll'):
         self.ip = ip
         self.lib_location = lib_location
         self.name = name
@@ -52,7 +56,7 @@ class PLC:
         return self.read_client.get_connected() and self.write_client.get_connected()
 
     def cpu_in_run(self):
-        return self.read_client.get_cpu_state() == cpu_statuses[8]
+        return self.read_client.get_cpu_state() == cpu_statuses.get(8)
 
     def cpu_info(self):
         return self.read_client.get_cpu_info()
@@ -88,8 +92,181 @@ class PLC:
                 raise e
 
 
+class PLCServer:
+    def __init__(self, ip="0.0.0.0", port=5555):
+        self.port = port
+        self._plc = PLC('192.168.30.1')
+        self._plc.connect()
+        self._context = zmq.Context()
+        self._socket = self._context.socket(zmq.REP)
+
+    def start(self):
+        self._socket.bind(f"tcp://*:{self.port}")
+        self.run()
+
+    def run(self):
+        while True:
+            msg = None
+            try:
+                msg = self._socket.recv().decode('utf-8')
+            except zmq.Again:
+                continue
+
+            if msg is not None:
+                req = json.loads(msg)
+                response = b''
+
+                if req.get('cmd') == 'read':
+                    response = self._plc.read(req.get('db'), req.get('start'), req.get('length'))
+
+                elif req.get('cmd') == 'write':
+                    self._plc.write(req.get('db'), req.get('start'), bytearray.fromhex(req.get('data')))
+                    response = msg.encode('utf-8')
+
+                elif req.get('cmd') == 'cpu_run':
+                    response = str(self._plc.cpu_in_run()).encode('utf-8')
+
+                self._socket.send(response)
+
+
+class PLCClient:
+    def __init__(self, ip="127.0.0.1", port=5555):
+        self.ip = ip
+        self.port = port
+        self._context = zmq.Context()
+        self._socket = self._context.socket(zmq.REQ)
+        self.SmartTags = SmartTags(self)
+
+    def connect(self):
+        self._socket.connect(f"tcp://{self.ip}:{self.port}")
+
+    def transfer(self, request):
+        self._socket.send(json.dumps(request).encode('utf-8'))
+        return self._socket.recv()
+
+    def cpu_in_run(self):
+        req = {
+            'cmd': 'cpu_run'
+        }
+        resonse = self.transfer(req)
+        return Util.str2bool(resonse.decode('utf-8'))
+
+    def read(self, db, start, length):
+        req = {
+            'cmd'   : 'read',
+            'db'    : db,
+            'start' : start,
+            'length': length
+        }
+        resonse = self.transfer(req)
+        return bytearray(resonse)
+
+    def write(self, db, start, data):
+        req = {
+            'cmd'  : 'write',
+            'db'   : db,
+            'start': start,
+            'data' : data.hex()
+        }
+        resonse = self.transfer(req)
+        return resonse
+
+    # Bool
+
+    def read_bool(self, db, start, offset):
+        datatype = DataTypes.Bool
+        length = datatype._bytelength
+        req = {
+            'cmd'   : 'read',
+            'db'    : db,
+            'start' : start,
+            'length': length
+        }
+        resonse = self.transfer(req)
+        data = datatype.get(resonse, offset)
+        return data
+
+    def write_bool(self, db, start, offset, value):
+        datatype = DataTypes.Bool
+        length = datatype._bytelength
+        data = bytearray(length)
+        datatype.set(data, offset, value)
+        req = {
+            'cmd'   : 'write',
+            'db'    : db,
+            'start' : start,
+            'length': length,
+            'data'  : data.hex()
+        }
+
+        resonse = self.transfer(req)
+        return resonse
+
+    # Byte
+
+    def read_byte(self, db, start):
+        datatype = DataTypes.Byte
+        length = datatype._bytelength
+        req = {
+            'cmd'   : 'read',
+            'db'    : db,
+            'start' : start,
+            'length': length
+        }
+        resonse = self.transfer(req)
+        data = datatype.get(bytearray(resonse))
+        return data
+
+    def write_byte(self, db, start, value):
+        datatype = DataTypes.Byte
+        length = datatype._bytelength
+        data = bytearray(length)
+        datatype.set(data, value)
+        req = {
+            'cmd'   : 'write',
+            'db'    : db,
+            'start' : start,
+            'length': length,
+            'data'  : data.hex()
+        }
+
+        resonse = self.transfer(req)
+        return resonse
+
+    # Char
+
+    def read_char(self, db, start):
+        datatype = DataTypes.Char
+        length = datatype._bytelength
+        req = {
+            'cmd'   : 'read',
+            'db'    : db,
+            'start' : start,
+            'length': length
+        }
+        resonse = self.transfer(req)
+        data = datatype.get(bytearray(resonse))
+        return data
+
+    def write_char(self, db, start, value):
+        datatype = DataTypes.Char
+        length = datatype._bytelength
+        data = bytearray(length)
+        datatype.set(data, value)
+        req = {
+            'cmd'   : 'write',
+            'db'    : db,
+            'start' : start,
+            'length': length,
+            'data'  : data.hex()
+        }
+
+        resonse = self.transfer(req)
+        return resonse
+
+
 if __name__ == '__main__':
-    s7 = PLC()
+    s7 = PLCServer()
     s7.connect()
 
     # Bool

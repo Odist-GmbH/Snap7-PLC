@@ -31,23 +31,24 @@ class Bool(PlcVar):
         self._bytelength = Bool._bytelength
         super(Bool, self).__init__()
 
-    def get(self, bytearr):
-        return snap7.util.get_bool(bytearr, 0, self.offset)
+    @staticmethod
+    def get(bytearr, offset):
+        return snap7.util.get_bool(bytearr, 0, offset)
 
-    def set(self, bytearr, value):
-        snap7.util.set_bool(bytearr, 0, self.offset, bool(value))
+    @staticmethod
+    def set(bytearr, offset, value):
+        snap7.util.set_bool(bytearr, 0, offset, bool(value))
 
     def read(self):
         reading = self.plc.read(self.db, self.start, self._bytelength)
-        result = self.get(reading)
-        # print(f"Bool\t{str(result)}\t{self.db}\t{self.start}\t{self.offset}")
+        result = self.get(reading, self.offset)
         return result == True
 
     def write(self, value):
         if value is None:
             value = False
         reading = self.plc.read(self.db, self.start, self._bytelength)
-        self.set(reading, value)
+        self.set(reading, self.offset, value)
         self.plc.write(self.db, self.start, reading)
 
     def toggle(self):
@@ -78,10 +79,12 @@ class Byte(PlcVar):
         self._bytelength = Byte._bytelength
         super(Byte, self).__init__()
 
-    def get(self, bytearr):
+    @staticmethod
+    def get(bytearr):
         return snap7.util.get_byte(bytearr, 0)
 
-    def set(self, bytearr, value):
+    @staticmethod
+    def set(bytearr, value):
         snap7.util.set_byte(bytearr, 0, value)
 
     def read(self):
@@ -900,7 +903,7 @@ class String(PlcVar):
         return snap7.util.get_string(bytearr, 0, self.length)
 
     def set(self, bytearr, value):
-        snap7.util.set_string(bytearr, 0, value,self.length)
+        snap7.util.set_string(bytearr, 0, value, self.length)
         bytearr[0] = self.length
 
     def read(self):
