@@ -900,7 +900,7 @@ class String(PlcVar):
         super(String, self).__init__()
 
     def get(self, bytearr):
-        return snap7.util.get_string(bytearr, 0, self.length)
+        return snap7.util.get_string(bytearr, 0)
 
     def set(self, bytearr, value):
         snap7.util.set_string(bytearr, 0, value, self.length)
